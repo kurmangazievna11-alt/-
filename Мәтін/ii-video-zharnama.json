@@ -86,5 +86,7 @@
   "sub": "Камерасыз · Монтажсыз",
   "photo": "Бастапқы/foto2.jpg",
   "term": "> ai_video --order"
- }
+ },
+ "music": "Бастапқы/fon-muzyka.mp3",
+ "music_volume": 0.16
 }
