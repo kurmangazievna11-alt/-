@@ -1,34 +1,88 @@
 {
  "name": "ii-video-zharnama",
  "lang": "kk",
- "voice": {"engine": "piper", "speaker": 5, "speed": 1.0},
- "theme": {"look": "tech", "bg1": "#0E0710", "bg2": "#2A0E22", "accent": "#FF4FA3"},
+ "voice": {
+  "engine": "piper",
+  "speaker": 5,
+  "speed": 1.0
+ },
+ "theme": {
+  "look": "tech",
+  "bg1": "#0E0710",
+  "bg2": "#2A0E22",
+  "accent": "#FF4FA3"
+ },
  "scenes": [
-  {"kind": "hook", "text": "Әлі де видеоны күндіз-түні *өзің* монтаждап жүрсің бе?",
-   "term": "> montazh --manual ... 12h"},
-  {"kind": "say", "viz": "photo", "photo": "Бастапқы/foto2.jpg", "badge": "СІЗДІҢ ИИ-МОНТАЖЕРІҢІЗ",
-   "big": "ИИ ВИДЕО", "text": "Мен *ИИ видео* жасаймын: түсірілім жоқ, камера жоқ, уақыт кетпейді.",
-   "speak": "Мен И И видео жасаймын: түсірілім жоқ, камера жоқ, уақыт кетпейді.",
-   "term": "> ai_video --start ... OK"},
-  {"kind": "step", "num": 1, "title": "Мәтін → видео", "viz": "list",
+  {
+   "kind": "hook",
+   "text": "Әлі де видеоны күндіз-түні *өзің* монтаждап жүрсің бе?",
+   "term": "> montazh --manual ... 12h"
+  },
+  {
+   "kind": "say",
+   "viz": "photo",
+   "photo": "Бастапқы/foto2.jpg",
+   "badge": "СІЗДІҢ ИИ-МОНТАЖЕРІҢІЗ",
+   "big": "ИИ ВИДЕО",
+   "text": "Мен *жасанды интеллект* арқылы видео жасаймын: түсірілім жоқ, камера жоқ, уақыт кетпейді.",
+   "term": "> ai_video --start ... OK"
+  },
+  {
+   "kind": "step",
+   "num": 1,
+   "title": "Мәтін → видео",
+   "viz": "list",
    "text": "Сенің мәтінің *дауысқа*, графикаға, субтитрге айналады.",
    "term": "> text_to_video ... OK",
-   "items": [["Дауыс", "дауысқа"], ["Графика", "графикаға"], ["Субтитр", "субтитрге"]]},
-  {"kind": "say", "viz": "flash", "num": "1", "unit": "КҮНДЕ ДАЙЫН",
-   "text": "Нәтижесі — *сатып* беретін видео, бір күнде дайын.",
-   "term": "> render --sell ... OK"},
-  {"kind": "say", "viz": "terminal",
-   "text": "Бәсекелестерің әлі CapCut-та отырғанда, сен *алға* шық!",
-   "speak": "Бәсекелестерің әлі КэпКатта отырғанда, сен алға шық!",
-   "term": "> compare --competitors",
-   "lines": ["> competitors: editing...", "[..] still in capcut", "> you: ai_video", "[ok] ready in 1 day"],
-   "strike": {"word": "CAPCUT", "at": "CapCut-та"}},
-  {"kind": "cta", "button": "Тапсырыс беру", "card": "Видеоң 1 күнде дайын болсын!",
+   "items": [
+    [
+     "Дауыс",
+     "дауысқа"
+    ],
+    [
+     "Графика",
+     "графикаға"
+    ],
+    [
+     "Субтитр",
+     "субтитрге"
+    ]
+   ]
+  },
+  {
+   "kind": "say",
+   "viz": "flash",
+   "num": "1",
+   "unit": "КҮНДЕ ДАЙЫН",
+   "text": "Нәтижесі — сен *қалағандай* видео, бір күнде дайын.",
+   "term": "> render --sell ... OK"
+  },
+  {
+   "kind": "cta",
+   "button": "Тапсырыс беру",
+   "card": "Видеоң 1 күнде дайын болсын!",
    "text": "Төмендегі батырманы бас, видеоңа тапсырыс бер!",
-   "term": "> order --ai_video", "icons": ["AI", "CC", "FX", "4K", "Aa"]}
+   "term": "> order --ai_video",
+   "icons": [
+    "AI",
+    "CC",
+    "FX",
+    "4K",
+    "Aa"
+   ]
+  }
  ],
  "cover": {
-  "lines": [["ИИ ВИДЕО", true], ["1 КҮНДЕ", false]],
+  "lines": [
+   [
+    "ИИ ВИДЕО",
+    true
+   ],
+   [
+    "1 КҮНДЕ",
+    false
+   ]
+  ],
   "sub": "Камерасыз · Монтажсыз",
   "photo": "Бастапқы/foto2.jpg",
   "term": "> ai_video --order"
