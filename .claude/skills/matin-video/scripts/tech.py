@@ -8,6 +8,8 @@
   "strike": {"word": "CAPCUT", "at": "CapCut"}  — viz=terminal: қызыл сызықпен өшірілетін сөз
   "items": [["REELS", "Reels"], ...]            — viz=list: [экрандағы жазу, айтылғанда шығатын сөз]
   "num": "10", "unit": "МИНУТ"                  — viz=flash
+  "photo": "Бастапқы/foto.jpg", "badge": "..."  — viz=photo: неон рамкадағы фото (баяу зум) + астында плашка
+  cover.photo                                    — обложкада телефонның орнына фото
 """
 import math
 import os
@@ -176,6 +178,48 @@ def render_mono(txt, px=30, col=(150, 165, 170)):
     img = Image.new("RGBA", (int(f.getlength(txt)) + 10, int(px * 1.5)), (0, 0, 0, 0))
     ImageDraw.Draw(img).text((0, 0), txt, font=f, fill=col + (255,))
     return img
+
+
+PH_W, PH_H = 620, 820
+
+
+def load_photo(path, w=PH_W, h=PH_H, zoom=1.0):
+    """Фотоны w×h көлемге кесіп (жоғарғы жағына қарай — бет кесілмесін), zoom есе үлкейтеді."""
+    im = Image.open(path).convert("RGB")
+    try:
+        from PIL import ImageOps
+        im = ImageOps.exif_transpose(im)
+    except Exception:
+        pass
+    sc = max(w / im.width, h / im.height) * zoom
+    im = im.resize((int(im.width * sc + 0.5), int(im.height * sc + 0.5)), Image.LANCZOS)
+    x = (im.width - w) // 2
+    y = int((im.height - h) * 0.3)
+    return im.crop((x, y, x + w, y + h))
+
+
+def render_photo_card(path, acc, zoom=1.0, w=PH_W, h=PH_H):
+    pad = 60
+    img = Image.new("RGBA", (w + pad * 2, h + pad * 2), (0, 0, 0, 0))
+    gl = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    ImageDraw.Draw(gl).rounded_rectangle([pad, pad, pad + w, pad + h], 48, outline=acc + (255,), width=18)
+    img = Image.alpha_composite(img, gl.filter(ImageFilter.GaussianBlur(26)))
+    ph = load_photo(path, w, h, zoom).convert("RGBA")
+    m = Image.new("L", (w, h), 0)
+    ImageDraw.Draw(m).rounded_rectangle([0, 0, w - 1, h - 1], 44, fill=255)
+    img.paste(ph, (pad, pad), m)
+    ImageDraw.Draw(img).rounded_rectangle([pad, pad, pad + w, pad + h], 46, outline=acc + (255,), width=7)
+    return img
+
+
+def render_badge(text, acc, px=54):
+    f = font(px, 700)
+    tw = int(f.getlength(text)) + 90
+    b = Image.new("RGBA", (tw, int(px * 1.9)), (0, 0, 0, 0))
+    d = ImageDraw.Draw(b)
+    d.rounded_rectangle([0, 0, tw - 1, b.height - 1], b.height // 2, fill=acc + (255,))
+    d.text((45, b.height / 2 - px * 0.68), text, font=f, fill=WHITE + (255,))
+    return b
 
 
 def render_laptop(acc):
@@ -510,6 +554,23 @@ class TechRenderer:
                 cv2.rectangle(fr, (c[0] - bw // 2, y0 + 470), (c[0] + bw // 2, y0 + 500),
                               tuple(int(v) for v in self.acc[::-1]), -1)
                 self.draw_timeline(fr, x0 + 80, y0 + 600, 360, 220, t, M.clamp(lt / max(1, en - st), 0, 1))
+        elif viz == "photo":
+            self.caption(fr, s, t, al)
+            k = M.ease(lt / 0.5)
+            zq = round(1.0 + 0.08 * M.clamp(lt / max(1, en - st), 0, 1), 3)
+            im = self.get(s, ("photo", zq), lambda: render_photo_card(sc["photo"], acc, zq))
+            pw, ph_ = im[1].shape[1], im[1].shape[0]
+            blend(fr, im, (W - pw) / 2, 520 + (1 - k) * 80, al * k)
+            bd = sc.get("badge")
+            if bd:
+                bi = self.get(s, "badge", lambda: render_badge(bd, acc))
+                k2 = M.ease((lt - 0.5) / 0.3)
+                bw = bi[1].shape[1]
+                sc_ = 0.7 + 0.3 * k2
+                rgb, a = bi
+                sz = (max(1, int(bw * sc_)), max(1, int(a.shape[0] * sc_)))
+                rgb, a = cv2.resize(rgb, sz), cv2.resize(a, sz)[:, :, None]
+                blend(fr, (rgb, a), (W - sz[0]) / 2, 520 + ph_ - 110 - sz[1] / 2, al * k2)
         elif viz == "terminal":
             self.caption(fr, s, t, al)
             lines = sc.get("lines", [])
@@ -709,6 +770,10 @@ def render_cover(plan, tl, out):
     r = TechRenderer(plan, tl, None)
     acc = r.acc
     fr = r.background(2.0)
+    if cv.get("photo"):
+        pc = render_photo_card(cv["photo"], acc, 1.0, 600, 790)
+        blend(fr, layer(pc), (W - pc.width) / 2, 715)
+        return _cover_text(fr, cv, acc, out)
     ph = layer(render_phone(acc))
     x0, y0 = (W - 520) // 2, 700
     blend(fr, ph, x0, y0, 0.9)
@@ -718,6 +783,10 @@ def render_cover(plan, tl, out):
     cv2.circle(fr, c, 60, (70, 78, 84), -1)
     cv2.ellipse(fr, (c[0], c[1] + 170), (110, 80), 0, 180, 360, (70, 78, 84), -1)
     cv2.rectangle(fr, (c[0] - 100, y0 + 470), (c[0] + 100, y0 + 500), tuple(int(v) for v in acc[::-1]), -1)
+    return _cover_text(fr, cv, acc, out)
+
+
+def _cover_text(fr, cv, acc, out):
     # заголовок
     lines = cv.get("lines", [["НОУТБУКСЫЗ", False], ["CLAUDE МОНТАЖ", True]])
     img = Image.new("RGBA", (1040, 600), (0, 0, 0, 0))
