@@ -1,7 +1,7 @@
 {
  "name": "ii-video-zharnama",
  "lang": "kk",
- "voice": {"engine": "piper", "speaker": 2, "speed": 1.08},
+ "voice": {"engine": "piper", "speaker": 4, "speed": 1.0},
  "theme": {"look": "tech", "bg1": "#0E0710", "bg2": "#2A0E22", "accent": "#FF4FA3"},
  "scenes": [
   {"kind": "hook", "text": "Әлі де видеоны күндіз-түні *өзің* монтаждап жүрсің бе?",
